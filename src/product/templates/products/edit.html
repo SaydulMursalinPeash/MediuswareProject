@@ -1,0 +1,162 @@
+{% extends 'backend/base.html' %}
+
+{% block title %} Edit {% endblock %}
+
+{% block content %}
+<style>
+    .edit_product{
+        position: relative;
+        height: fit-content;
+        width: 100%;
+        
+    }
+    .edit_form{
+        position: relative;
+        height: fit-content;
+        width: 100%;
+        display: flex;
+
+    }
+    .text_image{
+        position: relative;
+        width: 300px;
+
+    }
+    .input_div{
+        position: relative;
+        height: fit-content;
+        width: fit-content;
+        border: 2px solid rgb(93, 209, 241);
+        border-radius: 7px;
+        padding: 3px;
+        background-color: rgb(68, 138, 223);
+        box-sizing: border-box;
+        width: 290px;
+        margin-bottom: 10px;
+    }
+    .input_div .input_name{
+        position: relative;
+        margin-bottom: 3px;
+        font-size: 16px;
+        color: rgba(0, 0, 0, 0.625);
+    }
+    .input_div input{
+        position: relative;
+        height: 30px;
+        width: 280px;
+        border: none;
+        outline: none;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-radius: 5px;
+    }
+    .input_div textarea{
+        position: relative;
+        height: 200px;
+        width: 280px;
+        border: none;
+        outline: none;
+        border-radius: 5px;
+    }
+    .variant_div{
+        position: relative;
+        width: 300px;
+        height: fit-content;
+    }
+    .variants{
+        position: relative;
+        display: flex;
+        margin-bottom: 10px;
+    }
+    .variant{
+        margin-right: 10px;
+    }
+    .variant select{
+        position: relative;
+        height: 30px;
+    }
+</style>
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Edit Product</h1>
+    <a href="{% url 'product:create.product' %}" class="float-right btn btn-primary">All Product</a>
+</div>
+
+<div id="app">
+    <div class="edit_product">
+        <form method="POST" class="edit_form" enctype="multipart/form-data" action="">
+            {% csrf_token %}
+            <div class="text_image">
+                <div class="input_div">
+                    <p class="input_name">Product Name:</p>
+                    <input type="text" name="product_name" placeholder="Product name" value="{{ product.title }}" id="product_name">
+                </div>
+                <div class="input_div">
+                    <p class="input_name">Product SKU:</p>
+                    <input type="text" name="product_sku" placeholder="Product SKU" value="{{ product.sku }}" id="product_sku">
+                </div>
+                <div class="input_div">
+                    <p class="input_name">Product description:</p>
+                    <textarea name="descriptions" id="descriptions" placeholder="Descriptions">{{ product.description }}</textarea>
+                </div>
+                <div class="input_div">
+                    <p class="input_name">Product image:</p>
+                    <img src="{{product_image.file_path.url}}" style="height: auto;width: 280px; margin-bottom: 5px;" id="image_show">
+                    <input type="file" name="product_image"  class="image_up" style="background-color: aliceblue;">
+                    
+                </div>
+            </div>
+            <div class="variant_div">
+                {% for i in current_variants %}
+                <div class="variants">
+                    <div class="variant">
+                        <select id="variant{{i.id}}" name="variant">
+                            {% for j in variant %}
+                            {% if i.var.id == j.id %}
+                            <option selected value="{{i.id}}">{{ i.var.title }}</option>
+                            {% else %}
+                            <option value="{{j.id}}">{{j.title}}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="tags">
+                        <input type="text" value="{{i.tag}}" data-role="tagsinput" id="tags{{ i.id }}" class="tags_in" name="tags"/>
+                    </div>
+                </div>
+                {% endfor %}
+                <table class="table">
+                    <tr>
+                        <th>Variant</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                    </tr>
+                    {% for i in product_variant_price %}
+                    <tr>
+                        <td>{{i.product_variant_one.variant_title}}{{i.product_variant_two.variant_title}}{{i.product_variant_three.variant_title}}</td>
+                        <td><input type="number" value="{{i.price}}" name="price"/></td>
+                        <td><input type="number" value="{{i.stock}}" name="stock"/></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <button type="submit">Submit</button>
+            </div>
+            
+        </form>
+    </div>
+    
+</div>
+<script>
+    {
+        console.log("......................#############..............")
+        let im_up=document.querySelector(".image_up");
+        let im_sh=document.querySelector("#image_show");
+        console.log(im_up)
+        im_up.addEventListener("change",()=>{
+            im_sh.url=URL.createObjectURL(im_up.files[0])
+        })
+    }
+</script>
+
+
+{% endblock %}
